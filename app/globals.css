@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+html,
+body {
+  @apply bg-surface text-white antialiased;
+  font-family: var(--font-sans);
+}
+
+body {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@layer components {
+  .odds-btn {
+    @apply flex flex-col items-center justify-center rounded-md bg-surface-raised border border-surface-border min-w-[3.25rem] h-11 px-2 text-sm font-bold transition-all active:scale-95;
+  }
+  .odds-btn:hover {
+    @apply border-accent-green/50 bg-accent-green/10;
+  }
+  .odds-btn-selected {
+    @apply bg-accent-green text-black border-accent-green shadow-[0_0_12px_rgba(38,214,87,0.35)];
+  }
+  .card-surface {
+    @apply bg-surface-card border border-surface-border rounded-xl;
+  }
+  .chip-filter {
+    @apply whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold border border-surface-border bg-surface-card text-white/80 transition-colors;
+  }
+  .chip-filter-active {
+    @apply bg-accent-brand border-accent-brand text-white;
+  }
+  .nav-item-active {
+    @apply text-accent-green;
+  }
+}
+
+.skeleton {
+  @apply animate-pulse bg-surface-raised rounded;
+}
+
+.sheet-backdrop {
+  @apply fixed inset-0 bg-black/60 z-[90];
+}
+
+.sheet-panel {
+  @apply fixed bottom-0 left-0 right-0 z-[100] bg-surface-card border-t border-surface-border rounded-t-2xl max-h-[85vh] flex flex-col animate-slide-up;
+}

@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventStatus {
+  upcoming
+  live
+  finished
+  cancelled
+}
+
+enum MarketType {
+  one_x_two
+  over_under_15
+  over_under_25
+  btts
+  double_chance
+}
+
+enum BetStatus {
+  pending
+  won
+  lost
+  void
+  cashed_out
+}
+
+enum TransactionType {
+  deposit
+  withdraw
+  bet
+  win
+  refund
+  bonus
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  failed
+  cancelled
+}
+
+model User {
+  id           String        @id @default(uuid()) @db.Uuid
+  phoneNumber  String        @unique @map("phone_number")
+  pinHash      String        @map("pin_hash")
+  fullName     String        @default("") @map("full_name")
+  isActive     Boolean       @default(true) @map("is_active")
+  isVerified   Boolean       @default(false) @map("is_verified")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  lastLogin    DateTime      @default(now()) @map("last_login")
+  balance      UserBalance?
+  refreshToken RefreshToken?
+  bets         Bet[]
+  shareCodes   ShareCode[]
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id       String   @id @default(uuid()) @db.Uuid
+  userId   String   @unique @map("user_id") @db.Uuid
+  token    String   @default("")
+  expireAt DateTime @map("expire_at")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model UserBalance {
+  id             String @id @default(uuid()) @db.Uuid
+  userId         String @unique @map("user_id") @db.Uuid
+  playingBalance BigInt @default(0) @map("playing_balance")
+  winningBalance BigInt @default(0) @map("winning_balance")
+  bonusBalance   BigInt @default(500000) @map("bonus_balance")
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_balances")
+}
+
+model Transaction {
+  id             String            @id @default(uuid()) @db.Uuid
+  userId         String            @map("user_id") @db.Uuid
+  type           TransactionType
+  status         TransactionStatus @default(pending)
+  amount         BigInt
+  currency       String            @default("NGN")
+  idempotencyKey String?           @unique @map("idempotency_key")
+  reference      String            @default("")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model Sport {
+  id      String   @id @default(uuid()) @db.Uuid
+  name    String
+  slug    String   @unique
+  icon    String   @default("football")
+  sortOrder Int    @default(0) @map("sort_order")
+  leagues League[]
+
+  @@map("sports")
+}
+
+model League {
+  id        String  @id @default(uuid()) @db.Uuid
+  sportId   String  @map("sport_id") @db.Uuid
+  name      String
+  slug      String
+  country   String  @default("")
+  isPopular Boolean @default(false) @map("is_popular")
+  sortOrder Int     @default(0) @map("sort_order")
+  sport     Sport   @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  events    Event[]
+
+  @@unique([sportId, slug])
+  @@map("leagues")
+}
+
+model Event {
+  id           String      @id @default(uuid()) @db.Uuid
+  leagueId     String      @map("league_id") @db.Uuid
+  homeTeam     String      @map("home_team")
+  awayTeam     String      @map("away_team")
+  homeScore    Int         @default(0) @map("home_score")
+  awayScore    Int         @default(0) @map("away_score")
+  kickoff      DateTime
+  status       EventStatus @default(upcoming)
+  liveMinute   String      @default("") @map("live_minute")
+  isFeatured   Boolean     @default(false) @map("is_featured")
+  isHot        Boolean     @default(false) @map("is_hot")
+  externalId   String      @default("") @map("external_id")
+  league       League      @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  markets      Market[]
+  selections   BetSelection[]
+
+  @@index([status, kickoff])
+  @@index([leagueId])
+  @@map("events")
+}
+
+model Market {
+  id       String     @id @default(uuid()) @db.Uuid
+  eventId  String     @map("event_id") @db.Uuid
+  type     MarketType
+  specifier String    @default("")
+  event    Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  outcomes Outcome[]
+
+  @@unique([eventId, type, specifier])
+  @@map("markets")
+}
+
+model Outcome {
+  id        String @id @default(uuid()) @db.Uuid
+  marketId  String @map("market_id") @db.Uuid
+  key       String
+  label     String
+  odds      Decimal @db.Decimal(8, 2)
+  isActive  Boolean @default(true) @map("is_active")
+  market    Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  @@unique([marketId, key])
+  @@map("outcomes")
+}
+
+model Bet {
+  id         String        @id @default(uuid()) @db.Uuid
+  userId     String        @map("user_id") @db.Uuid
+  stake      BigInt
+  totalOdds  Decimal       @map("total_odds") @db.Decimal(12, 4)
+  potential  BigInt
+  status     BetStatus     @default(pending)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  selections BetSelection[]
+
+  @@map("bets")
+}
+
+model BetSelection {
+  id           String     @id @default(uuid()) @db.Uuid
+  betId        String     @map("bet_id") @db.Uuid
+  eventId      String     @map("event_id") @db.Uuid
+  marketType   MarketType @map("market_type")
+  outcomeKey   String     @map("outcome_key")
+  outcomeLabel String     @map("outcome_label")
+  oddsAtPlace  Decimal    @map("odds_at_place") @db.Decimal(8, 2)
+  bet          Bet        @relation(fields: [betId], references: [id], onDelete: Cascade)
+  event        Event      @relation(fields: [eventId], references: [id])
+
+  @@map("bet_selections")
+}
+
+model ShareCode {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  legs      Json
+  createdBy String?  @map("created_by") @db.Uuid
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("share_codes")
+}

@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import dayjs from "dayjs";
-import { OddsButton } from "@/components/betting/OddsButton";
+import clsx from "clsx";
+import { ChevronRight } from "lucide-react";
 import type { MarketType } from "@prisma/client";
+import { OddsButton } from "@/components/betting/OddsButton";
 import { useSlipStore } from "@/lib/slip-store";
 import { outcomeLabel } from "@/lib/betting/markets";
 
@@ -25,9 +27,10 @@ export type EventRowData = {
 type Props = {
   event: EventRowData;
   compact?: boolean;
+  showLeague?: boolean;
 };
 
-export function EventRow({ event, compact }: Props) {
+export function EventRow({ event, showLeague }: Props) {
   const addLeg = useSlipStore((s) => s.addLeg);
   const hasLeg = useSlipStore((s) => s.hasLeg);
 
@@ -39,7 +42,12 @@ export function EventRow({ event, compact }: Props) {
       awayTeam: event.awayTeam,
       marketType,
       outcomeKey: key,
-      outcomeLabel: outcomeLabel(marketType, key, event.homeTeam, event.awayTeam),
+      outcomeLabel: outcomeLabel(
+        marketType,
+        key,
+        event.homeTeam,
+        event.awayTeam
+      ),
       odds,
     });
   }
@@ -48,34 +56,53 @@ export function EventRow({ event, compact }: Props) {
   const isLive = event.status === "live";
 
   return (
-    <div className="card-surface p-3 space-y-2">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          {!compact && event.leagueName && (
-            <p className="text-[10px] text-white/45 truncate">{event.leagueName}</p>
-          )}
-          <Link href={`/event/${event.id}`} className="block hover:text-accent-green">
-            <p className="text-sm font-semibold truncate">{event.homeTeam}</p>
-            <p className="text-sm font-semibold truncate">{event.awayTeam}</p>
-          </Link>
-        </div>
-        <div className="text-right shrink-0">
+    <div className="flex items-stretch gap-2 border-b border-surface-border last:border-b-0 bg-surface-card px-2.5 py-2 hover:bg-surface-raised/70 transition-colors">
+      <Link
+        href={`/event/${event.id}`}
+        className="flex min-w-0 flex-1 gap-2 items-center"
+      >
+        <div className="w-[2.6rem] shrink-0 text-center leading-tight">
           {isLive ? (
             <>
-              <span className="text-[10px] font-bold text-accent-green">LIVE</span>
-              <p className="text-xs font-bold">
-                {event.homeScore}-{event.awayScore}
+              <p className="text-[8px] font-black uppercase text-accent-red tracking-wide flex items-center justify-center gap-0.5">
+                <span className="w-1 h-1 rounded-full bg-accent-red animate-pulse" />
+                Live
               </p>
-              <p className="text-[10px] text-white/50">{event.liveMinute}</p>
+              <p className="text-[11px] font-black tabular-nums text-ink">
+                {event.homeScore ?? 0}-{event.awayScore ?? 0}
+              </p>
+              <p className="text-[8px] text-muted tabular-nums">
+                {event.liveMinute || "—"}
+              </p>
             </>
           ) : (
-            <p className="text-[10px] text-white/50">
-              {dayjs(event.kickoff).format("HH:mm DD/MM")}
-            </p>
+            <>
+              <p className="text-[11px] font-bold tabular-nums text-accent-green">
+                {dayjs(event.kickoff).format("HH:mm")}
+              </p>
+              <p className="text-[8px] text-muted">
+                {dayjs(event.kickoff).format("DD/MM")}
+              </p>
+            </>
           )}
         </div>
-      </div>
-      <div className="flex gap-1.5">
+
+        <div className="min-w-0 flex-1 py-0.5">
+          {showLeague && event.leagueName && (
+            <p className="text-[8px] text-muted truncate mb-0.5 font-semibold">
+              {event.leagueName}
+            </p>
+          )}
+          <p className="text-[12.5px] font-semibold truncate leading-snug text-ink">
+            {event.homeTeam}
+          </p>
+          <p className="text-[12.5px] font-semibold truncate leading-snug text-ink">
+            {event.awayTeam}
+          </p>
+        </div>
+      </Link>
+
+      <div className="flex items-center gap-1 shrink-0 self-center">
         {o.home != null && (
           <OddsButton
             label="1"
@@ -105,9 +132,13 @@ export function EventRow({ event, compact }: Props) {
         )}
         <Link
           href={`/event/${event.id}`}
-          className="ml-auto text-[10px] text-accent-green font-semibold self-center px-2"
+          className={clsx(
+            "w-7 h-9 rounded-md flex items-center justify-center",
+            "text-muted hover:text-accent-green hover:bg-accent-green/10"
+          )}
+          aria-label="More markets"
         >
-          +markets
+          <ChevronRight size={15} />
         </Link>
       </div>
     </div>

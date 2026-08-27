@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Trophy, Radio, Flame } from "lucide-react";
 import clsx from "clsx";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 type Sport = {
   id: string;
   name: string;
   slug: string;
-  leagues: { id: string; name: string; slug: string; country: string; isPopular: boolean }[];
+  leagues: {
+    id: string;
+    name: string;
+    slug: string;
+    country: string;
+    isPopular: boolean;
+  }[];
 };
 
 export default function SportsPage() {
@@ -29,64 +37,113 @@ export default function SportsPage() {
   const rest = sport?.leagues.filter((l) => !l.isPopular) || [];
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)]">
-      <aside className="w-28 shrink-0 border-r border-surface-border bg-surface-card">
-        <p className="text-[10px] font-bold text-accent-green px-2 py-3">Popular</p>
+    <div className="pb-24">
+      <PageHeader
+        title="Sports"
+        subtitle="Browse leagues and markets"
+        backHref="/"
+      />
+
+      <div className="px-3 sm:px-5 mb-4 grid grid-cols-2 gap-2">
+        <Link
+          href="/?tab=live"
+          className="card-surface rounded-2xl p-4 flex items-center gap-3 hover:border-accent-green/40"
+        >
+          <span className="w-10 h-10 rounded-xl bg-accent-red/15 text-accent-red flex items-center justify-center">
+            <Radio size={18} />
+          </span>
+          <div>
+            <p className="text-[14px] font-bold text-ink">Live now</p>
+            <p className="text-[11px] text-muted">In-play football</p>
+          </div>
+        </Link>
+        <Link
+          href="/?tab=today"
+          className="card-surface rounded-2xl p-4 flex items-center gap-3 hover:border-accent-green/40"
+        >
+          <span className="w-10 h-10 rounded-xl bg-accent-green/15 text-accent-green flex items-center justify-center">
+            <Flame size={18} />
+          </span>
+          <div>
+            <p className="text-[14px] font-bold text-ink">Today</p>
+            <p className="text-[11px] text-muted">Today’s football</p>
+          </div>
+        </Link>
+      </div>
+
+      <div className="px-3 sm:px-5 flex gap-2 overflow-x-auto pb-3 scrollbar-none">
         {sports.map((s) => (
           <button
             key={s.id}
             type="button"
             onClick={() => setActiveSport(s.slug)}
             className={clsx(
-              "w-full text-left px-2 py-2.5 text-xs font-medium border-l-2",
+              "shrink-0 h-10 px-4 rounded-full text-[13px] font-bold transition",
               activeSport === s.slug
-                ? "border-accent-green text-accent-green bg-white/5"
-                : "border-transparent text-white/60"
+                ? "bg-accent-green text-[#0A1433]"
+                : "card-surface text-muted hover:text-ink"
             )}
           >
             {s.name}
           </button>
         ))}
-      </aside>
-      <div className="flex-1 p-3 overflow-y-auto pb-24">
-        <p className="text-xs text-white/40 mb-2">Quick links</p>
-        <Link
-          href="/"
-          className="block py-2 text-sm font-semibold border-b border-surface-border"
-        >
-          Today&apos;s Football
-        </Link>
-        <Link
-          href="/?filter=live"
-          className="block py-2 text-sm font-semibold border-b border-surface-border"
-        >
-          Live Now
-        </Link>
+      </div>
+
+      <div className="px-3 sm:px-5 space-y-4">
         {popular.length > 0 && (
-          <>
-            <p className="text-[10px] font-bold text-white/40 mt-4 mb-2 uppercase">
-              Popular leagues
-            </p>
-            {popular.map((l) => (
-              <Link
-                key={l.id}
-                href={`/sports/${sport?.slug}/${l.slug}`}
-                className="block py-2.5 text-sm font-semibold border-b border-surface-border hover:text-accent-green"
-              >
-                {l.name}
-              </Link>
-            ))}
-          </>
+          <section>
+            <div className="flex items-center gap-2 mb-2 px-0.5">
+              <Trophy size={15} className="text-accent-green" />
+              <h2 className="text-[14px] font-black text-ink">Popular leagues</h2>
+            </div>
+            <div className="card-surface rounded-2xl overflow-hidden divide-y divide-surface-border">
+              {popular.map((l) => (
+                <Link
+                  key={l.id}
+                  href={`/sports/${sport?.slug}/${l.slug}`}
+                  className="flex items-center justify-between px-4 py-3.5 hover:bg-[var(--surface-raised)]"
+                >
+                  <div>
+                    <p className="text-[14px] font-semibold text-ink">{l.name}</p>
+                    <p className="text-[11px] text-muted">{l.country}</p>
+                  </div>
+                  <span className="text-[11px] font-bold text-accent-green">
+                    Open
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
         )}
-        {rest.map((l) => (
-          <Link
-            key={l.id}
-            href={`/sports/${sport?.slug}/${l.slug}`}
-            className="block py-2.5 text-sm text-white/70 border-b border-surface-border"
-          >
-            {l.name}
-          </Link>
-        ))}
+
+        {rest.length > 0 && (
+          <section>
+            <h2 className="text-[14px] font-black text-ink mb-2 px-0.5">
+              All {sport?.name || "leagues"}
+            </h2>
+            <div className="card-surface rounded-2xl overflow-hidden divide-y divide-surface-border">
+              {rest.map((l) => (
+                <Link
+                  key={l.id}
+                  href={`/sports/${sport?.slug}/${l.slug}`}
+                  className="flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-raised)]"
+                >
+                  <div>
+                    <p className="text-[13px] font-semibold text-ink">{l.name}</p>
+                    <p className="text-[11px] text-muted">{l.country}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {!sports.length && (
+          <p className="text-sm text-muted text-center py-10">
+            No sports loaded — run{" "}
+            <code className="text-accent-green">npm run db:seed</code>
+          </p>
+        )}
       </div>
     </div>
   );

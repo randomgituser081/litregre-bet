@@ -36,7 +36,7 @@ export default function LoginPage() {
   return (
     <div className="flex-1 flex flex-col justify-center px-6 py-12">
       <h1 className="text-2xl font-black mb-1">Log in</h1>
-      <p className="text-sm text-white/45 mb-8">Phone + PIN</p>
+      <p className="text-sm text-muted mb-8">Phone + PIN</p>
       <form onSubmit={submit} className="space-y-4">
         <input
           type="tel"
@@ -59,12 +59,12 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 bg-accent-green text-black rounded-xl font-bold"
+          className="w-full py-3.5 bg-accent-green text-[#0A1433] rounded-xl font-bold"
         >
           {loading ? "..." : "Login"}
         </button>
       </form>
-      <p className="text-center text-sm text-white/45 mt-6">
+      <p className="text-center text-sm text-muted mt-6">
         New here?{" "}
         <Link href="/register" className="text-accent-green font-semibold">
           Join now

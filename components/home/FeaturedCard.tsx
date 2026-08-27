@@ -34,10 +34,10 @@ export function FeaturedCard({ event }: { event: EventRowData }) {
       </div>
       <Link href={`/event/${event.id}`}>
         <p className="text-lg font-black leading-tight">{event.homeTeam}</p>
-        <p className="text-xs text-white/50 my-1">vs</p>
+        <p className="text-xs text-muted my-1">vs</p>
         <p className="text-lg font-black leading-tight">{event.awayTeam}</p>
       </Link>
-      <p className="text-[10px] text-white/45 mt-2">
+      <p className="text-[10px] text-muted mt-2">
         {event.leagueName} · {dayjs(event.kickoff).format("HH:mm DD MMM")}
       </p>
       <div className="flex gap-2 mt-3">

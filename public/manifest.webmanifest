@@ -3,6 +3,13 @@
   "short_name": "LitreGre",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0d0d",
-  "theme_color": "#0d0d0d"
+  "background_color": "#F5F7FA",
+  "theme_color": "#22D366",
+  "icons": [
+    {
+      "src": "/brand/mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
 }

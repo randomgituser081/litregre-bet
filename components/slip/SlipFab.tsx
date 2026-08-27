@@ -8,22 +8,25 @@ export function SlipFab() {
   const count = useSlipStore((s) => s.legs.length);
   const setOpen = useSlipStore((s) => s.setOpen);
 
+  if (count === 0) return null;
+
   return (
     <button
       type="button"
       onClick={() => setOpen(true)}
       className={clsx(
-        "fixed z-[85] right-4 bottom-[4.5rem] w-14 h-14 rounded-full bg-accent-green text-black shadow-lg flex items-center justify-center",
-        count === 0 && "opacity-90"
+        "fixed z-[85] right-3 bottom-[3.75rem]",
+        "bg-accent-green text-[#0A1433]",
+        "flex items-center gap-1.5 px-3 py-2.5 rounded-md shadow-lg",
+        "text-[12px] font-black transition-transform active:scale-95"
       )}
       aria-label="Open betslip"
     >
-      <Ticket size={22} strokeWidth={2.5} />
-      {count > 0 && (
-        <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 rounded-full bg-white text-black text-xs font-black flex items-center justify-center px-1">
-          {count}
-        </span>
-      )}
+      <Ticket size={16} strokeWidth={2.5} />
+      Betslip
+      <span className="min-w-[1.15rem] h-[1.15rem] rounded-sm bg-[#0A1433] text-accent-green text-[10px] font-black flex items-center justify-center px-1">
+        {count}
+      </span>
     </button>
   );
 }

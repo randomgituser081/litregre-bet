@@ -12,17 +12,36 @@ const config: Config = {
       },
       colors: {
         surface: {
-          DEFAULT: "#0d0d0d",
-          card: "#1a1a1a",
-          raised: "#242424",
-          border: "#2e2e2e",
+          DEFAULT: "var(--surface)",
+          card: "var(--surface-card)",
+          raised: "var(--surface-raised)",
+          border: "var(--surface-border)",
+        },
+        ink: "var(--lg-ink)",
+        muted: "var(--text-muted)",
+        odds: {
+          tint: "var(--odds-bg)",
+          border: "var(--odds-border)",
+          text: "var(--odds-text)",
         },
         accent: {
-          green: "#26d657",
-          "green-dim": "#1eb849",
+          green: "#22D366",
+          "green-dim": "#16b355",
+          lime: "#7CFF30",
           red: "#e83535",
-          brand: "#c8102e",
+          brand: "#22D366",
         },
+        neon: {
+          cyan: "#22D366",
+          green: "#7CFF30",
+        },
+      },
+      boxShadow: {
+        "neon-cyan":
+          "0 0 24px rgba(34, 211, 102, 0.22), inset 0 0 20px rgba(34, 211, 102, 0.04)",
+        "neon-cyan-sm": "0 0 12px rgba(34, 211, 102, 0.35)",
+        "neon-green": "0 0 20px rgba(124, 255, 48, 0.35)",
+        "neon-green-sm": "0 0 12px rgba(34, 211, 102, 0.35)",
       },
       animation: {
         "pulse-odds": "pulseOdds 0.4s ease-out",

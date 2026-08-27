@@ -1,12 +1,16 @@
 "use client";
 
-import { SlipFab } from "@/components/slip/SlipFab";
 import { SlipSheet } from "@/components/slip/SlipSheet";
+import { SlipPreviewBar } from "@/components/slip/SlipPreviewBar";
 
-export function SlipShell() {
+type Props = {
+  hideFabOnHome?: boolean;
+};
+
+export function SlipShell(_props: Props) {
   return (
     <>
-      <SlipFab />
+      <SlipPreviewBar />
       <SlipSheet />
     </>
   );

@@ -201,7 +201,7 @@ export function HomeContent() {
     );
   }
 
-  const railTitle = live.length ? "Live" : "Featured";
+  const railTitle = live.length ? "Live" : "Sports";
   const railAccent = live.length ? ("live" as const) : ("hot" as const);
   const railHref = live.length ? "/?tab=live" : "/sports";
 
@@ -209,7 +209,7 @@ export function HomeContent() {
     <div>
       <PromoHero />
 
-      <div className="px-3 lg:px-5 pb-10 space-y-5 pt-1">
+      <div className="px-3 lg:px-5 pb-10 space-y-5 pt-0">
         {loading ? (
           <div className="space-y-5">
             <div className="skeleton h-9 w-44 rounded-xl" />

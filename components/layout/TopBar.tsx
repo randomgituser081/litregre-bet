@@ -11,6 +11,7 @@ import {
   PanelLeftClose,
   Sun,
   Moon,
+  ChevronDown,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatNaira } from "@/lib/utils";
@@ -82,21 +83,66 @@ export function TopBar() {
           )}
         </div>
 
-        <div className="flex flex-1 min-w-0 items-center gap-2.5 px-3 lg:px-5">
-          <div className="flex lg:hidden items-center gap-2 min-w-0">
+        <div className="flex flex-1 min-w-0 items-center gap-2 px-3 lg:px-5">
+          {/* Mobile: logo + balance pill + avatar */}
+          <div className="flex lg:hidden items-center gap-2 min-w-0 flex-1">
             <BrandLogo href="/" size="sm" product="bet" inverted={inverted} />
             <button
               type="button"
               onClick={toggle}
-              className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
               style={{
                 background: "var(--chrome-elevated)",
                 color: "var(--chrome-text)",
               }}
               aria-label="Open menu"
             >
-              <Menu size={18} />
+              <Menu size={17} />
             </button>
+
+            <div className="ml-auto flex items-center gap-2 shrink-0">
+              {me ? (
+                <>
+                  <Link
+                    href="/me?tab=deposit"
+                    className="balance-pill"
+                    aria-label="Wallet balance"
+                  >
+                    <span className="balance-pill__icon">
+                      <Wallet size={13} strokeWidth={2.5} />
+                    </span>
+                    <span className="balance-pill__amount tabular-nums">
+                      {formatNaira(Math.round(me.balance * 100))}
+                    </span>
+                    <ChevronDown size={12} className="balance-pill__chev opacity-60" />
+                  </Link>
+                  <Link
+                    href="/me"
+                    className="topbar-avatar"
+                    aria-label="Account"
+                  >
+                    <User size={16} />
+                    <span className="topbar-avatar__badge">VIP</span>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-[12px] font-semibold px-2 py-1.5"
+                    style={{ color: "var(--chrome-muted)" }}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center h-9 rounded-full bg-accent-green text-[#0A1433] text-[12px] font-bold px-3.5"
+                  >
+                    Join
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
 
           {collapsed && (
@@ -118,7 +164,7 @@ export function TopBar() {
 
           <form
             onSubmit={onSearch}
-            className="hidden sm:flex flex-1 max-w-md items-center gap-2 h-10 rounded-full px-3.5"
+            className="hidden lg:flex flex-1 max-w-md items-center gap-2 h-10 rounded-full px-3.5"
             style={{ background: "var(--chrome-elevated)" }}
           >
             <Search
@@ -137,16 +183,7 @@ export function TopBar() {
             />
           </form>
 
-          <Link
-            href="/search"
-            className="sm:hidden w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ background: "var(--chrome-elevated)" }}
-            aria-label="Search"
-          >
-            <Search size={17} />
-          </Link>
-
-          <div className="ml-auto flex items-center gap-2 shrink-0">
+          <div className="hidden lg:flex ml-auto items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={toggleTheme}
@@ -162,26 +199,24 @@ export function TopBar() {
             {me ? (
               <>
                 <Link
-                  href="/me"
-                  className="hidden sm:flex items-center h-10 rounded-full px-3 text-[13px] font-bold tabular-nums"
-                  style={{ background: "var(--chrome-elevated)" }}
-                >
-                  {formatNaira(Math.round(me.balance * 100))}
-                </Link>
-                <Link
                   href="/me?tab=deposit"
-                  className="inline-flex items-center gap-1.5 h-10 rounded-full bg-accent-green text-[#0A1433] text-[13px] font-bold px-4 hover:bg-accent-lime transition-colors"
+                  className="balance-pill balance-pill--lg"
                 >
-                  <Wallet size={15} strokeWidth={2.5} />
-                  <span className="hidden sm:inline">Deposit</span>
+                  <span className="balance-pill__icon">
+                    <Wallet size={14} strokeWidth={2.5} />
+                  </span>
+                  <span className="balance-pill__amount tabular-nums">
+                    {formatNaira(Math.round(me.balance * 100))}
+                  </span>
+                  <ChevronDown size={13} className="balance-pill__chev opacity-60" />
                 </Link>
                 <Link
                   href="/me"
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ background: "var(--chrome-elevated)" }}
+                  className="topbar-avatar topbar-avatar--lg"
                   aria-label="Account"
                 >
                   <User size={18} />
+                  <span className="topbar-avatar__badge">VIP</span>
                 </Link>
               </>
             ) : (

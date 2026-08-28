@@ -15,7 +15,7 @@ const PROMOS = [
     cta: "Create account",
     tone: "from-[#1e5c40] via-[#174a34] to-[#0A1433]",
     wash: "linear-gradient(90deg, #1e5c40 0%, #1e5c40 40%, rgba(30,92,64,0.75) 58%, transparent 85%)",
-    image: "/images/hero/saka-join-original.png",
+    image: "/images/hero/player-defender-join.png",
     icon: Gift,
   },
   {
@@ -27,7 +27,7 @@ const PROMOS = [
     cta: "Open bets",
     tone: "from-[#2563EB] via-[#1D4ED8] to-[#0A1433]",
     wash: "linear-gradient(90deg, #2563EB 0%, #2563EB 40%, rgba(37,99,235,0.75) 58%, transparent 85%)",
-    image: "/images/hero/saka-gift-original.png",
+    image: "/images/hero/player-keeper-gift.png",
     icon: Ticket,
   },
   {
@@ -39,7 +39,7 @@ const PROMOS = [
     cta: "Today’s picks",
     tone: "from-[#7C3AED] via-[#5B21B6] to-[#0A1433]",
     wash: "linear-gradient(90deg, #7C3AED 0%, #7C3AED 40%, rgba(124,58,237,0.75) 58%, transparent 85%)",
-    image: "/images/hero/saka-hero-original.png",
+    image: "/images/hero/player-striker-hero.png",
     icon: Sparkles,
   },
 ];

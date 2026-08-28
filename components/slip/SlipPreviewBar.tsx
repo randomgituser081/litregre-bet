@@ -19,7 +19,7 @@ export function SlipPreviewBar() {
     stakeKobo > BigInt(0) ? Number(stakeKobo) * totalOdds : 0;
 
   return (
-    <div className="fixed left-0 right-0 z-[88] bottom-[3.35rem] px-2 max-w-lg lg:max-w-[42rem] mx-auto animate-slide-up">
+    <div className="fixed left-0 right-0 z-[88] bottom-[5.15rem] px-2 max-w-lg lg:max-w-[42rem] mx-auto animate-slide-up">
       <div className="rounded-md border-2 border-accent-green/50 bg-surface-card shadow-[0_8px_28px_rgba(34,211,102,0.2)] overflow-hidden">
         <div className="p-2.5 space-y-2">
           <div className="flex items-center justify-between">

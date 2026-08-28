@@ -41,7 +41,7 @@ export function MatchCard({ event }: Props) {
   return (
     <article
       className={clsx(
-        "match-card match-card--compact group shrink-0 w-[14.5rem] sm:w-[15.25rem] rounded-2xl flex flex-col overflow-hidden",
+        "match-card match-card--compact group shrink-0 w-[15.5rem] sm:w-[16.25rem] rounded-2xl flex flex-col overflow-hidden",
         isLive && "match-card--live"
       )}
     >

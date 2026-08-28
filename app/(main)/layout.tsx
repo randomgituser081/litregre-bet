@@ -24,7 +24,7 @@ export default function MainLayout({
 
         <div className="flex flex-1 w-full max-w-[90rem] mx-auto">
           <SideBar />
-          <main className="flex-1 min-w-0 pb-20 lg:pb-8">{children}</main>
+          <main className="flex-1 min-w-0 pb-24 lg:pb-8">{children}</main>
         </div>
 
         <SlipShell hideFabOnHome={isHome} />

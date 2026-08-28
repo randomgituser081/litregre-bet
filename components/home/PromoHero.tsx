@@ -3,11 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { formatNaira } from "@/lib/utils";
 
 const AUTO_MS = 5200;
-const IMG_V = "photo-blend1";
+const IMG_V = "cast-v2";
+
+type Me = { name?: string; phone?: string; balance: number } | null;
+
+function shortName(me: Me): string | null {
+  if (!me) return null;
+  const n = me.name?.trim();
+  if (n && n.length > 1 && !/^\d+$/.test(n)) return n.split(/\s+/)[0]!;
+  if (me.phone && me.phone.length >= 4) return `••••${me.phone.slice(-4)}`;
+  return null;
+}
 
 type SlideTone = {
   card: string;
@@ -94,44 +105,44 @@ const TONE_FOREST_LIGHT: SlideTone = {
   nav: "bg-white/15 text-white hover:bg-white/25",
 };
 
-/** Full photos with their own backgrounds — left color washes into the image */
+/** Diverse cast — fictional athletes for promo surfaces */
 const HERO_SLIDES: HeroSlide[] = [
   {
-    id: "saka-win",
+    id: "win-big",
     eyebrow: "Premier League",
     title: "Win big on football this season",
     body: "Place your share of daily markets across Premier League, UCL & more.",
     cta: "Place a bet",
     href: "/sports/football/epl",
-    image: `/images/hero/saka-hero-original.png?v=${IMG_V}`,
-    alt: "Bukayo Saka",
-    objectPos: "object-[62%_12%]",
+    image: `/images/hero/player-striker-hero.png?v=${IMG_V}`,
+    alt: "Striker with trophy",
+    objectPos: "object-[70%_20%]",
     dark: TONE_ORANGE,
     light: TONE_NAVY_LIGHT,
   },
   {
-    id: "saka-live",
+    id: "live",
     eyebrow: "Live markets",
     title: "Feel every chance. Bet as it happens.",
     body: "From kickoff to stoppage time — in-play football that keeps pace with the game.",
     cta: "Go live",
     href: "/?tab=live",
-    image: `/images/hero/saka-join-original.png?v=${IMG_V}`,
-    alt: "Bukayo Saka celebrating",
-    objectPos: "object-[58%_18%]",
+    image: `/images/hero/player-midfielder-live.png?v=${IMG_V}`,
+    alt: "Midfielder in action",
+    objectPos: "object-[68%_18%]",
     dark: TONE_GUNNER_DARK,
     light: TONE_GUNNER_LIGHT,
   },
   {
-    id: "saka-picks",
+    id: "picks",
     eyebrow: "Today’s picks",
     title: "Build your slip. Chase the green.",
     body: "Stack real football markets — Premier League to UCL — and ride the run.",
     cta: "Browse sports",
     href: "/sports",
-    image: `/images/hero/saka-gift-original.png?v=${IMG_V}`,
-    alt: "Bukayo Saka with the ball",
-    objectPos: "object-[55%_20%]",
+    image: `/images/hero/player-keeper-gift.png?v=${IMG_V}`,
+    alt: "Goalkeeper save",
+    objectPos: "object-[65%_22%]",
     dark: TONE_FOREST_DARK,
     light: TONE_FOREST_LIGHT,
   },
@@ -143,8 +154,8 @@ const SIDE_PROMOS = [
     href: "/register",
     title: "GET STARTED WITH LITREGRE",
     body: "Join and start placing on real football markets.",
-    image: `/images/hero/saka-join-original.png?v=${IMG_V}`,
-    objectPos: "object-[60%_20%]",
+    image: `/images/hero/player-defender-join.png?v=${IMG_V}`,
+    objectPos: "object-[72%_15%]",
     dark: {
       card: "from-[#3B82FF] via-[#2563EB] to-[#1D4ED8]",
       wash: "linear-gradient(90deg, #2563EB 0%, #2563EB 36%, rgba(37,99,235,0.85) 52%, rgba(37,99,235,0.3) 68%, transparent 86%)",
@@ -165,8 +176,8 @@ const SIDE_PROMOS = [
     href: "/promotions",
     title: "CLAIM YOUR GIFT",
     body: "Promos & booking codes waiting in your slip.",
-    image: `/images/hero/saka-gift-original.png?v=${IMG_V}`,
-    objectPos: "object-[58%_22%]",
+    image: `/images/hero/player-winger-victory.png?v=${IMG_V}`,
+    objectPos: "object-[70%_18%]",
     dark: {
       card: "from-[#A855F7] via-[#7C3AED] to-[#5B21B6]",
       wash: "linear-gradient(90deg, #7C3AED 0%, #7C3AED 36%, rgba(124,58,237,0.85) 52%, rgba(124,58,237,0.3) 68%, transparent 86%)",
@@ -187,11 +198,29 @@ const SIDE_PROMOS = [
 export function PromoHero() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [me, setMe] = useState<Me>(null);
   const { theme } = useTheme();
   const isLight = theme === "light";
   const slide = HERO_SLIDES[i];
   const tone = isLight ? slide.light : slide.dark;
   const touchX = useRef<number | null>(null);
+  const loggedIn = !!me;
+  const name = shortName(me);
+
+  useEffect(() => {
+    void fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.user) {
+          setMe({
+            name: d.user.name,
+            phone: d.user.phone,
+            balance: typeof d.balance === "number" ? d.balance : 0,
+          });
+        }
+      })
+      .catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     if (paused) return;
@@ -200,6 +229,30 @@ export function PromoHero() {
     }, AUTO_MS);
     return () => window.clearInterval(id);
   }, [paused, i]);
+
+  const sidePromos = useMemo(() => {
+    if (!loggedIn || !me) return SIDE_PROMOS.map((p) => ({ ...p, chip: "Open" }));
+
+    const bal = formatNaira(Math.round(me.balance * 100));
+    return [
+      {
+        ...SIDE_PROMOS[0],
+        id: "wallet",
+        href: "/me?tab=deposit",
+        title: "YOUR WALLET IS READY",
+        body: `${bal} available — top up or place your next slip.`,
+        chip: "Deposit",
+      },
+      {
+        ...SIDE_PROMOS[1],
+        id: "offers",
+        href: "/promotions",
+        title: "OFFERS FOR YOU",
+        body: "Promos & booking codes waiting on your account.",
+        chip: "View",
+      },
+    ] as const;
+  }, [loggedIn, me]);
 
   function go(n: number) {
     setI(((n % HERO_SLIDES.length) + HERO_SLIDES.length) % HERO_SLIDES.length);
@@ -211,14 +264,20 @@ export function PromoHero() {
     go(i + 1);
   }
 
+  const eyebrow = loggedIn
+    ? name
+      ? `For you · ${slide.eyebrow}`
+      : `Member · ${slide.eyebrow}`
+    : slide.eyebrow;
+
   return (
-    <section className="w-full p-3 sm:p-4 lg:p-5">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4 lg:min-h-[22rem]">
+    <section className="w-full px-0 pt-0 pb-2 sm:p-3 lg:p-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4 lg:min-h-[22rem]">
         <div
-          className={`relative lg:col-span-2 overflow-hidden rounded-[1.75rem] bg-gradient-to-br ${tone.card} min-h-[16rem] sm:min-h-[18rem] lg:min-h-full transition-[background] duration-500 ${
+          className={`relative lg:col-span-2 overflow-hidden rounded-none sm:rounded-[1.75rem] bg-gradient-to-br ${tone.card} min-h-[15.5rem] sm:min-h-[18rem] lg:min-h-full transition-[background] duration-500 ${
             isLight
               ? "shadow-[0_12px_32px_rgba(10,20,51,0.12)]"
-              : "shadow-[0_18px_40px_rgba(10,20,51,0.14)]"
+              : "shadow-[0_18px_40px_rgba(0,0,0,0.35)]"
           }`}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
@@ -272,11 +331,17 @@ export function PromoHero() {
           />
 
           <div className="relative z-10 flex h-full flex-col justify-between p-5 sm:p-7 lg:p-8 max-w-[52%]">
-            <div key={slide.id} className="hero-slide-copy">
+            <div key={`${slide.id}-${loggedIn ? "in" : "out"}`} className="hero-slide-copy">
+              {loggedIn && (
+                <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm border border-white/15">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />
+                  {name ? `Welcome back, ${name}` : "Welcome back"}
+                </p>
+              )}
               <p
                 className={`text-[11px] font-bold uppercase tracking-[0.18em] ${tone.eyebrow}`}
               >
-                {slide.eyebrow}
+                {eyebrow}
               </p>
               <h1
                 className={`mt-2 text-2xl sm:text-3xl lg:text-[2.15rem] font-black leading-[1.1] tracking-tight ${tone.title}`}
@@ -286,16 +351,18 @@ export function PromoHero() {
               <p
                 className={`mt-3 text-[13px] sm:text-sm max-w-md leading-relaxed ${tone.body}`}
               >
-                {slide.body}
+                {loggedIn && i === 0
+                  ? "Your slip is ready — stack today’s markets and chase the green."
+                  : slide.body}
               </p>
             </div>
 
             <div className="mt-6 flex items-center gap-3 flex-wrap">
               <Link
-                href={slide.href}
+                href={loggedIn && slide.id === "win-big" ? "/?tab=today" : slide.href}
                 className={`inline-flex items-center justify-center rounded-full text-[13px] sm:text-sm font-bold px-5 py-2.5 transition-colors ${tone.cta}`}
               >
-                {slide.cta}
+                {loggedIn && slide.id === "win-big" ? "See today’s picks" : slide.cta}
               </Link>
 
               <div className="flex items-center gap-1.5 ml-1">
@@ -347,14 +414,14 @@ export function PromoHero() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 lg:gap-4">
-          {SIDE_PROMOS.map((promo) => {
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3 lg:gap-4 px-3 sm:px-0">
+          {sidePromos.map((promo) => {
             const p = isLight ? promo.light : promo.dark;
             return (
               <Link
                 key={promo.id}
                 href={promo.href}
-                className={`group relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br ${p.card} min-h-[10.5rem] transition ${
+                className={`group relative overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] bg-gradient-to-br ${p.card} min-h-[8.5rem] sm:min-h-[10.5rem] transition ${
                   isLight
                     ? "shadow-[0_10px_28px_rgba(10,20,51,0.1)] hover:brightness-[1.03]"
                     : "hover:brightness-110 shadow-[0_14px_32px_rgba(10,20,51,0.12)]"
@@ -396,7 +463,7 @@ export function PromoHero() {
                   <span
                     className={`mt-3 inline-flex w-fit rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide ${p.chip}`}
                   >
-                    Open
+                    {"chip" in promo ? promo.chip : "Open"}
                   </span>
                 </div>
               </Link>

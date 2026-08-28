@@ -15,7 +15,7 @@ const ThemeContext = createContext<{
   toggleTheme: () => void;
   setTheme: (t: BetTheme) => void;
 }>({
-  theme: "light",
+  theme: "dark",
   toggleTheme: () => {},
   setTheme: () => {},
 });
@@ -23,7 +23,7 @@ const ThemeContext = createContext<{
 const STORAGE_KEY = "lb-theme";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<BetTheme>("light");
+  const [theme, setThemeState] = useState<BetTheme>("dark");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

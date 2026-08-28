@@ -3,11 +3,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { SplashScreen } from "@/components/brand/SplashScreen";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(() => new QueryClient());
   return (
     <ThemeProvider>
+      <SplashScreen product="bet" />
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     </ThemeProvider>
   );

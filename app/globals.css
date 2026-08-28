@@ -41,24 +41,24 @@
 [data-theme="dark"] {
   --lg-ink: #f5f7fa;
   --surface: #070b16;
-  --surface-card: #151c2e;
+  --surface-card: #121828;
   --surface-raised: #1a2440;
-  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-border: rgba(255, 255, 255, 0.07);
   --text-main: #f5f7fa;
-  --text-muted: rgba(245, 247, 250, 0.55);
-  --glass-bg: rgba(34, 211, 102, 0.1);
-  --glass-border: rgba(34, 211, 102, 0.28);
+  --text-muted: rgba(245, 247, 250, 0.52);
+  --glass-bg: rgba(34, 211, 102, 0.08);
+  --glass-border: rgba(34, 211, 102, 0.22);
   --sheet-bg: #0e1838;
   --header-bg: #0b1224;
   --league-header: #0b1224;
-  --odds-bg: #0f2a1c;
-  --odds-border: #1f6b3a;
-  --odds-text: #7cff30;
+  --odds-bg: rgba(255, 255, 255, 0.06);
+  --odds-border: rgba(255, 255, 255, 0.1);
+  --odds-text: #ffffff;
   --chrome: #0b1224;
   --chrome-elevated: #151c2e;
   --chrome-text: #ffffff;
-  --chrome-muted: rgba(255, 255, 255, 0.45);
-  --chrome-border: rgba(255, 255, 255, 0.08);
+  --chrome-muted: rgba(255, 255, 255, 0.42);
+  --chrome-border: rgba(255, 255, 255, 0.07);
   --sidebar: #0b1224;
   --sidebar-elevated: #151c2e;
   --sidebar-text: #f5f7fa;
@@ -67,7 +67,7 @@
   --panel: #151c2e;
   --panel-inset: #0b1224;
   --panel-soft: rgba(255, 255, 255, 0.45);
-  --rail-ctrl: #151c2e;
+  --rail-ctrl: rgba(255, 255, 255, 0.06);
   color-scheme: dark;
 }
 
@@ -89,7 +89,13 @@ body {
 }
 
 body {
-  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding-bottom: 0;
+  }
 }
 
 @layer components {
@@ -580,4 +586,323 @@ body {
 
 [data-theme="dark"] .auth-card__head {
   background: linear-gradient(165deg, #070b16 0%, #0a1433 50%, #0f2a1f 100%);
+}
+
+/* ── DICEBET-style chrome ───────────────────────────────────────── */
+.balance-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.125rem;
+  padding: 0 0.55rem 0 0.4rem;
+  border-radius: 999px;
+  background: var(--chrome-elevated);
+  border: 1px solid var(--chrome-border);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--chrome-text);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.balance-pill--lg {
+  height: 2.5rem;
+  padding: 0 0.75rem 0 0.55rem;
+  font-size: 13px;
+}
+
+.balance-pill:hover {
+  border-color: rgba(34, 211, 102, 0.35);
+  background: color-mix(in srgb, var(--chrome-elevated) 85%, #22d366);
+}
+
+.balance-pill__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  background: rgba(34, 211, 102, 0.18);
+  color: #22d366;
+}
+
+.balance-pill--lg .balance-pill__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.topbar-avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #243356, #151c2e);
+  border: 1px solid rgba(142, 182, 255, 0.25);
+  color: #8eb6ff;
+}
+
+.topbar-avatar--lg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.topbar-avatar__badge {
+  position: absolute;
+  bottom: -0.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.05rem 0.3rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.bottom-nav-float {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 80;
+  padding: 0 0.75rem calc(max(0.65rem, env(safe-area-inset-bottom, 0px)));
+  pointer-events: none;
+}
+
+.bottom-nav-float__inner {
+  pointer-events: auto;
+  margin: 0 auto;
+  max-width: 32rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 4rem;
+  padding: 0 0.35rem;
+  border-radius: 1.25rem;
+  background: rgba(11, 18, 36, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 -10px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 0.35rem;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.42);
+  transition: color 0.15s ease;
+}
+
+.bottom-nav-item--active {
+  color: #22d366;
+}
+
+.bottom-nav-wallet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-top: -1.35rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(145deg, #7cff30 0%, #22d366 55%, #16b355 100%);
+  box-shadow:
+    0 0 28px rgba(34, 211, 102, 0.55),
+    0 10px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bottom-nav-wallet:active {
+  transform: scale(0.94);
+}
+
+.bottom-nav-wallet--active {
+  box-shadow:
+    0 0 36px rgba(124, 255, 48, 0.7),
+    0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .odds-btn-selected {
+  @apply bg-accent-green text-[#0A1433] border-accent-green shadow-neon-green-sm;
+}
+
+[data-theme="dark"] .match-card__odds--on {
+  background: #22d366 !important;
+  border-color: #22d366 !important;
+  box-shadow: 0 0 16px rgba(34, 211, 102, 0.35);
+}
+
+[data-theme="dark"] .match-card__odds-val {
+  color: #fff;
+}
+
+[data-theme="dark"] .match-card__odds--on .match-card__odds-val {
+  color: #0a1433;
+}
+
+/* ── Branded splash ─────────────────────────────────────────────── */
+.lg-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(34, 211, 102, 0.18), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59, 130, 255, 0.12), transparent 50%),
+    #070b16;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.lg-splash--out {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.lg-splash__glow {
+  position: absolute;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(34, 211, 102, 0.35), transparent 70%);
+  filter: blur(40px);
+  animation: lgSplashPulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.lg-splash__glow--blue {
+  width: 12rem;
+  height: 12rem;
+  top: 18%;
+  right: 8%;
+  background: radial-gradient(circle, rgba(59, 130, 255, 0.3), transparent 70%);
+  animation-delay: 0.6s;
+}
+
+.lg-splash__mark-wrap {
+  position: relative;
+  width: 6.5rem;
+  height: 6.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.lg-splash__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  border: 1.5px solid rgba(34, 211, 102, 0.35);
+  animation: lgSplashRing 2s ease-out infinite;
+}
+
+.lg-splash__ring--delay {
+  animation-delay: 1s;
+  border-color: rgba(59, 130, 255, 0.3);
+}
+
+.lg-splash__mark {
+  filter: drop-shadow(0 0 18px rgba(34, 211, 102, 0.45));
+  animation: lgSplashLogoIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lg-splash__wordmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  animation: lgSplashLogoIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.lg-splash__brand {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #fff;
+  line-height: 1;
+}
+
+.lg-splash__product {
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  color: #22d366;
+}
+
+.lg-splash__tagline {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  animation: lgSplashLogoIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+}
+
+.lg-splash__spinner {
+  animation: lgSplashLogoIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+}
+
+@keyframes lgSplashPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes lgSplashRing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes lgSplashLogoIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-splash__glow,
+  .lg-splash__ring,
+  .lg-splash__mark,
+  .lg-splash__wordmark,
+  .lg-splash__tagline,
+  .lg-splash__spinner {
+    animation: none !important;
+  }
 }

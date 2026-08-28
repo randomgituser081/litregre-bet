@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Gift, Lock, Phone, User } from "lucide-react";
+import { Lock, Phone, User } from "lucide-react";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthSubmitButton } from "@/components/auth/AuthSubmitButton";
@@ -75,13 +75,13 @@ export default function RegisterPage() {
         </>
       }
     >
-      <ul className="mb-5 space-y-2">
+      <ul className="auth-perks mb-5 rounded-xl p-3.5 space-y-2">
         {PERKS.map((text) => (
           <li
             key={text}
-            className="flex items-start gap-2 text-[11px] text-muted font-medium"
+            className="flex items-start gap-2.5 text-[11px] text-ink/80 font-medium leading-snug"
           >
-            <Gift size={14} className="shrink-0 text-accent-green mt-0.5" />
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-green" />
             {text}
           </li>
         ))}

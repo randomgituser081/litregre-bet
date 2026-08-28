@@ -534,3 +534,36 @@ body {
   font-size: 12px;
   font-weight: 700;
 }
+
+/* ── Auth pages ── */
+.auth-hero {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34, 211, 102, 0.28), transparent 55%),
+    linear-gradient(165deg, #0a1433 0%, #0f2a1f 45%, #1a4d32 100%);
+}
+
+.auth-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  box-shadow:
+    0 20px 50px rgba(10, 20, 51, 0.12),
+    0 0 0 1px rgba(34, 211, 102, 0.08);
+}
+
+.auth-input {
+  background: var(--surface-raised);
+  border: 1.5px solid var(--surface-border);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-input:focus {
+  border-color: #22d366;
+  box-shadow: 0 0 0 3px rgba(34, 211, 102, 0.18);
+}
+
+[data-theme="dark"] .auth-card {
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(34, 211, 102, 0.12);
+}

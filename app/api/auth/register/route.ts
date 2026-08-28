@@ -16,16 +16,19 @@ export async function POST(req: Request) {
   const pin = String(body.pin || "");
   const name = String(body.name || "").trim();
 
-  if (phone.length < 12 || !/^\d{4,6}$/.test(pin)) {
+  if (phone.length < 12 || phone.length > 13 || !/^\d{4,6}$/.test(pin)) {
     return NextResponse.json(
-      { error: "Valid phone and 4–6 digit PIN required." },
+      { error: "Enter a valid Nigerian phone and a 4–6 digit PIN." },
       { status: 400 }
     );
   }
 
   const existing = await prisma.user.findUnique({ where: { phoneNumber: phone } });
   if (existing) {
-    return NextResponse.json({ error: "Phone already registered." }, { status: 409 });
+    return NextResponse.json(
+      { error: "This phone is already registered. Try logging in instead." },
+      { status: 409 }
+    );
   }
 
   const pinHash = await bcrypt.hash(pin, 10);
@@ -34,6 +37,7 @@ export async function POST(req: Request) {
       phoneNumber: phone,
       pinHash,
       fullName: name || "Player",
+      isVerified: true,
       balance: {
         create: {
           playingBalance: BigInt(0),
@@ -41,6 +45,7 @@ export async function POST(req: Request) {
         },
       },
     },
+    include: { balance: true },
   });
 
   const token = await signSession({
@@ -49,7 +54,16 @@ export async function POST(req: Request) {
     name: user.fullName,
   });
 
-  const res = NextResponse.json({ ok: true, user: { id: user.id, phone, name: user.fullName } });
+  const bal = user.balance;
+  const totalKobo = bal
+    ? bal.playingBalance + bal.winningBalance + bal.bonusBalance
+    : BigInt(500000);
+
+  const res = NextResponse.json({
+    ok: true,
+    user: { id: user.id, phone: user.phoneNumber, name: user.fullName },
+    balance: Number(totalKobo) / 100,
+  });
   res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
   return res;
 }

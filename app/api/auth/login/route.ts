@@ -13,14 +13,21 @@ export async function POST(req: Request) {
   }
 
   const phone = normalizePhone(String(body.phone || ""));
-  const pin = String(body.pin || "");
+  const pin = String(body.pin || "").replace(/\D/g, "");
+
+  if (phone.length < 12 || phone.length > 13 || !/^\d{4,6}$/.test(pin)) {
+    return NextResponse.json(
+      { error: "Enter a valid Nigerian phone and a 4–6 digit PIN." },
+      { status: 400 }
+    );
+  }
 
   const user = await prisma.user.findUnique({
     where: { phoneNumber: phone },
     include: { balance: true },
   });
 
-  if (!user || !(await bcrypt.compare(pin, user.pinHash))) {
+  if (!user || !user.isActive || !(await bcrypt.compare(pin, user.pinHash))) {
     return NextResponse.json({ error: "Invalid phone or PIN." }, { status: 401 });
   }
 

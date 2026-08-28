@@ -283,8 +283,10 @@ export function HomeContent() {
 
             {!events.length && (
               <p className="text-sm text-muted text-center py-10">
-                No events loaded — run{" "}
-                <code className="text-accent-green">npm run db:seed</code>
+                No fixtures yet — set{" "}
+                <code className="text-accent-green">PREDICTION_API_PHONE</code>{" "}
+                in Coolify and run sync, or{" "}
+                <code className="text-accent-green">npm run sync:events</code>
               </p>
             )}
           </>

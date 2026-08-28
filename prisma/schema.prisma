@@ -131,6 +131,8 @@ model Event {
   leagueId     String      @map("league_id") @db.Uuid
   homeTeam     String      @map("home_team")
   awayTeam     String      @map("away_team")
+  homeLogo     String      @default("") @map("home_logo")
+  awayLogo     String      @default("") @map("away_logo")
   homeScore    Int         @default(0) @map("home_score")
   awayScore    Int         @default(0) @map("away_score")
   kickoff      DateTime
@@ -145,6 +147,7 @@ model Event {
 
   @@index([status, kickoff])
   @@index([leagueId])
+  @@index([externalId])
   @@map("events")
 }
 

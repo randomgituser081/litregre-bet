@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { EventStatus } from "@prisma/client";
+import { prisma } from "@/lib/db";
 import {
   fetchEvents,
   serializeEvent,
   get1x2Outcomes,
 } from "@/lib/betting/queries";
+import { maybeSyncEvents } from "@/lib/sync/prediction-events";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -18,6 +20,18 @@ export async function GET(req: Request) {
   if (filter === "featured") featured = true;
 
   try {
+    let upcoming = await prisma.event.count({
+      where: { status: EventStatus.upcoming },
+    });
+    if (upcoming < 3) {
+      await maybeSyncEvents(true);
+      upcoming = await prisma.event.count({
+        where: { status: EventStatus.upcoming },
+      });
+    } else {
+      void maybeSyncEvents();
+    }
+
     const events = await fetchEvents({
       status,
       featured,

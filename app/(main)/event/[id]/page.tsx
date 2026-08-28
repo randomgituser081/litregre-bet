@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import dayjs from "dayjs";
 import type { MarketType } from "@prisma/client";
 import { OddsButton } from "@/components/betting/OddsButton";
+import { TeamLogo } from "@/components/betting/TeamLogo";
 import { useSlipStore } from "@/lib/slip-store";
 import { outcomeLabel, MARKET_LABELS } from "@/lib/betting/markets";
 
@@ -12,6 +13,8 @@ type EventDetail = {
   id: string;
   homeTeam: string;
   awayTeam: string;
+  homeLogo?: string;
+  awayLogo?: string;
   homeScore: number;
   awayScore: number;
   kickoff: string;
@@ -21,7 +24,7 @@ type EventDetail = {
   markets: {
     id: string;
     type: MarketType;
-    outcomes: { key: string; label: string; odds: number }[];
+    outcomes: { key: string; label: string; odds: number; isActive?: boolean }[];
   }[];
 };
 
@@ -66,9 +69,15 @@ export default function EventDetailPage() {
       <div className="bg-surface-card border-b border-surface-border px-3 py-3">
         <p className="text-[11px] text-muted font-semibold">{event.league.name}</p>
         <div className="mt-2 flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-bold truncate">{event.homeTeam}</p>
-            <p className="text-[15px] font-bold truncate">{event.awayTeam}</p>
+          <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex items-center gap-2">
+              <TeamLogo src={event.homeLogo} name={event.homeTeam} />
+              <p className="text-[15px] font-bold truncate">{event.homeTeam}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <TeamLogo src={event.awayLogo} name={event.awayTeam} />
+              <p className="text-[15px] font-bold truncate">{event.awayTeam}</p>
+            </div>
           </div>
           <div className="text-right shrink-0">
             {isLive ? (
@@ -101,7 +110,9 @@ export default function EventDetailPage() {
             {MARKET_LABELS[market.type]}
           </p>
           <div className="grid grid-cols-3 gap-1.5 p-2">
-            {market.outcomes.map((o) => (
+            {market.outcomes
+              .filter((o) => o.isActive !== false)
+              .map((o) => (
               <OddsButton
                 key={o.key}
                 label={o.label}

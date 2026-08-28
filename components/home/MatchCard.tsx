@@ -6,19 +6,12 @@ import clsx from "clsx";
 import type { MarketType } from "@prisma/client";
 import { useSlipStore } from "@/lib/slip-store";
 import { outcomeLabel } from "@/lib/betting/markets";
+import { TeamLogo } from "@/components/betting/TeamLogo";
 import type { EventRowData } from "@/components/betting/EventRow";
 
 type Props = {
   event: EventRowData;
 };
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-  return name.slice(0, 2).toUpperCase();
-}
 
 export function MatchCard({ event }: Props) {
   const addLeg = useSlipStore((s) => s.addLeg);
@@ -84,9 +77,7 @@ export function MatchCard({ event }: Props) {
           className="flex items-center gap-1.5 min-h-[3.25rem]"
         >
           <div className="flex-1 min-w-0 flex flex-col items-center gap-1 text-center">
-            <span className="match-card__crest match-card__crest--sm">
-              {initials(event.homeTeam)}
-            </span>
+            <TeamLogo src={event.homeLogo} name={event.homeTeam} size="sm" />
             <p className="text-[11px] font-bold text-ink leading-tight line-clamp-2 w-full">
               {event.homeTeam}
             </p>
@@ -109,9 +100,7 @@ export function MatchCard({ event }: Props) {
           </div>
 
           <div className="flex-1 min-w-0 flex flex-col items-center gap-1 text-center">
-            <span className="match-card__crest match-card__crest--sm">
-              {initials(event.awayTeam)}
-            </span>
+            <TeamLogo src={event.awayLogo} name={event.awayTeam} size="sm" />
             <p className="text-[11px] font-bold text-ink leading-tight line-clamp-2 w-full">
               {event.awayTeam}
             </p>

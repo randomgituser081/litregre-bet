@@ -60,6 +60,8 @@ export function serializeEvent(ev: EventWithMarkets) {
     id: ev.id,
     homeTeam: ev.homeTeam,
     awayTeam: ev.awayTeam,
+    homeLogo: ev.homeLogo || undefined,
+    awayLogo: ev.awayLogo || undefined,
     homeScore: ev.homeScore,
     awayScore: ev.awayScore,
     kickoff: ev.kickoff.toISOString(),
@@ -93,6 +95,8 @@ export function get1x2Outcomes(ev: EventWithMarkets) {
   const m = ev.markets.find((x) => x.type === "one_x_two");
   if (!m) return null;
   const map: Record<string, number> = {};
-  for (const o of m.outcomes) map[o.key] = Number(o.odds);
-  return map;
+  for (const o of m.outcomes) {
+    if (o.isActive) map[o.key] = Number(o.odds);
+  }
+  return Object.keys(map).length ? map : null;
 }

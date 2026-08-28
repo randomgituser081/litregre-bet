@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { ChevronRight } from "lucide-react";
 import type { MarketType } from "@prisma/client";
 import { OddsButton } from "@/components/betting/OddsButton";
+import { TeamLogo } from "@/components/betting/TeamLogo";
 import { useSlipStore } from "@/lib/slip-store";
 import { outcomeLabel } from "@/lib/betting/markets";
 
@@ -13,6 +14,8 @@ export type EventRowData = {
   id: string;
   homeTeam: string;
   awayTeam: string;
+  homeLogo?: string;
+  awayLogo?: string;
   kickoff: string;
   status: string;
   liveMinute?: string;
@@ -93,12 +96,18 @@ export function EventRow({ event, showLeague }: Props) {
               {event.leagueName}
             </p>
           )}
-          <p className="text-[12.5px] font-semibold truncate leading-snug text-ink">
-            {event.homeTeam}
-          </p>
-          <p className="text-[12.5px] font-semibold truncate leading-snug text-ink">
-            {event.awayTeam}
-          </p>
+          <div className="flex items-center gap-1.5">
+            <TeamLogo src={event.homeLogo} name={event.homeTeam} size="sm" />
+            <p className="text-[12.5px] font-semibold truncate leading-snug text-ink flex-1 min-w-0">
+              {event.homeTeam}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <TeamLogo src={event.awayLogo} name={event.awayTeam} size="sm" />
+            <p className="text-[12.5px] font-semibold truncate leading-snug text-ink flex-1 min-w-0">
+              {event.awayTeam}
+            </p>
+          </div>
         </div>
       </Link>
 

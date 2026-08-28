@@ -34,7 +34,12 @@ export async function POST(req: Request) {
       phoneNumber: phone,
       pinHash,
       fullName: name || "Player",
-      balance: { create: {} },
+      balance: {
+        create: {
+          playingBalance: BigInt(0),
+          bonusBalance: BigInt(500000),
+        },
+      },
     },
   });
 

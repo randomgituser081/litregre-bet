@@ -1,22 +1,60 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import dayjs from "dayjs";
 import { Ticket } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { formatNaira } from "@/lib/utils";
+
+type BetItem = {
+  id: string;
+  stake: number;
+  totalOdds: number;
+  potential: number;
+  status: string;
+  createdAt: string;
+  selections: {
+    homeTeam: string;
+    awayTeam: string;
+    outcomeLabel: string;
+    odds: number;
+    leagueName: string;
+  }[];
+};
 
 export default function OpenBetsPage() {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [tab, setTab] = useState<"open" | "history">("open");
+  const [bets, setBets] = useState<BetItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const [code, setCode] = useState("");
+
+  const loadBets = useCallback(async (t: "open" | "history", authed: boolean) => {
+    if (!authed) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/bets?tab=${t}`);
+      const data = await res.json();
+      setBets(data.items || []);
+    } catch {
+      setBets([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     void fetch("/api/auth/me")
       .then((r) => r.json())
-      .then((d) => setLoggedIn(!!d.user))
+      .then((d) => {
+        const ok = !!d.user;
+        setLoggedIn(ok);
+        if (ok) void loadBets(tab, true);
+      })
       .catch(() => setLoggedIn(false));
-  }, []);
+  }, [tab, loadBets]);
 
   return (
     <div className="pb-24">
@@ -68,12 +106,19 @@ export default function OpenBetsPage() {
           </div>
         )}
 
-        {loggedIn && (
+        {loggedIn && loading && (
+          <div className="space-y-2">
+            <div className="skeleton h-24 w-full rounded-xl" />
+            <div className="skeleton h-24 w-full rounded-xl" />
+          </div>
+        )}
+
+        {loggedIn && !loading && bets.length === 0 && (
           <div className="card-surface rounded-2xl p-8 text-center space-y-3">
             <Ticket size={28} className="mx-auto text-accent-green" />
             <p className="text-sm text-muted">
-              No {tab === "open" ? "open" : "settled"} bets yet. Build a slip from
-              any match and place when betting goes live.
+              No {tab === "open" ? "open" : "settled"} bets yet. Pick odds on any
+              match and hit Place Bet.
             </p>
             <Link
               href="/?tab=today"
@@ -83,6 +128,65 @@ export default function OpenBetsPage() {
             </Link>
           </div>
         )}
+
+        {loggedIn &&
+          !loading &&
+          bets.map((bet) => (
+            <article
+              key={bet.id}
+              className="card-surface rounded-2xl p-4 space-y-3"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-[11px] text-muted">
+                    {dayjs(bet.createdAt).format("DD MMM YYYY · HH:mm")}
+                  </p>
+                  <p className="text-sm font-black text-ink mt-0.5">
+                    {bet.selections.length}-fold @ {bet.totalOdds.toFixed(2)}
+                  </p>
+                </div>
+                <span
+                  className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${
+                    bet.status === "pending"
+                      ? "bg-accent-green/15 text-accent-green"
+                      : bet.status === "won"
+                        ? "bg-accent-green/20 text-accent-green"
+                        : "bg-surface-raised text-muted"
+                  }`}
+                >
+                  {bet.status}
+                </span>
+              </div>
+
+              <ul className="space-y-2 border-t border-surface-border pt-2">
+                {bet.selections.map((s, i) => (
+                  <li key={i} className="text-[12px]">
+                    <p className="font-semibold text-ink truncate">
+                      {s.homeTeam} vs {s.awayTeam}
+                    </p>
+                    <p className="text-[10px] text-muted truncate">
+                      {s.leagueName} · {s.outcomeLabel} @ {s.odds.toFixed(2)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex justify-between text-[12px] pt-1 border-t border-surface-border">
+                <span className="text-muted">
+                  Stake{" "}
+                  <strong className="text-ink">
+                    {formatNaira(bet.stake)}
+                  </strong>
+                </span>
+                <span className="text-muted">
+                  To win{" "}
+                  <strong className="text-accent-green">
+                    {formatNaira(bet.potential)}
+                  </strong>
+                </span>
+              </div>
+            </article>
+          ))}
 
         <section className="card-surface rounded-2xl p-5 space-y-3">
           <h2 className="text-[15px] font-black text-ink">Load a booking code</h2>
@@ -98,28 +202,32 @@ export default function OpenBetsPage() {
             />
             <button
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 if (!code.trim()) {
                   toast.error("Enter a code first");
                   return;
                 }
-                toast.success(`Code ${code.trim()} loaded (demo)`);
+                try {
+                  const res = await fetch("/api/codes/load", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code: code.trim() }),
+                  });
+                  const data = await res.json();
+                  if (!res.ok) {
+                    toast.error(data.error || "Invalid code");
+                    return;
+                  }
+                  toast.success("Code loaded — open your betslip");
+                } catch {
+                  toast.error("Network error");
+                }
               }}
               className="h-11 px-4 rounded-xl bg-accent-green text-[#0A1433] font-bold text-sm shrink-0"
             >
               Load
             </button>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setCode("DEMO01");
-              toast.success("DEMO01 ready — 3 folds @ 4.52");
-            }}
-            className="text-[12px] font-bold text-accent-green"
-          >
-            Try sample code DEMO01 →
-          </button>
         </section>
 
         <Link

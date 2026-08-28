@@ -40,11 +40,12 @@ function parseKickoff(item: JsonRecord): Date | null {
     return Number.isNaN(d.getTime()) ? null : d;
   }
   if (iso && time) {
-    const d = new Date(`${iso}T${time}:00Z`);
+    // API date+time is UTC (matches prediction backend storage)
+    const d = new Date(`${iso}T${time.padStart(5, "0")}:00.000Z`);
     return Number.isNaN(d.getTime()) ? null : d;
   }
   if (iso) {
-    const d = new Date(`${iso}T12:00:00Z`);
+    const d = new Date(`${iso}T15:00:00.000Z`);
     return Number.isNaN(d.getTime()) ? null : d;
   }
   return null;

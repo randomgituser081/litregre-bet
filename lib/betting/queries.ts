@@ -1,4 +1,4 @@
-import type { EventStatus, Prisma } from "@prisma/client";
+import { EventStatus, type Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 
 export type EventWithMarkets = Prisma.EventGetPayload<{
@@ -14,10 +14,16 @@ export async function fetchEvents(opts?: {
   sportSlug?: string;
   featured?: boolean;
   limit?: number;
+  syncedOnly?: boolean;
 }) {
   const where: Prisma.EventWhereInput = {};
-  if (opts?.status) where.status = opts.status;
+  if (opts?.status) {
+    where.status = opts.status;
+  } else {
+    where.status = { not: "cancelled" };
+  }
   if (opts?.featured) where.isFeatured = true;
+  if (opts?.syncedOnly) where.externalId = { not: "" };
   if (opts?.leagueSlug || opts?.sportSlug) {
     where.league = {
       ...(opts.leagueSlug ? { slug: opts.leagueSlug } : {}),
@@ -33,6 +39,15 @@ export async function fetchEvents(opts?: {
     },
     orderBy: [{ status: "asc" }, { kickoff: "asc" }],
     take: opts?.limit ?? 100,
+  });
+}
+
+export async function countSyncedUpcoming() {
+  return prisma.event.count({
+    where: {
+      status: EventStatus.upcoming,
+      externalId: { not: "" },
+    },
   });
 }
 

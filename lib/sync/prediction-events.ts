@@ -250,11 +250,19 @@ export async function syncEventsFromPredictions(): Promise<SyncResult> {
       data: { status: EventStatus.cancelled },
     });
 
+    let clearedSeed = { count: 0 };
+    if (ids.length > 0) {
+      clearedSeed = await prisma.event.updateMany({
+        where: { externalId: "", status: EventStatus.upcoming },
+        data: { status: EventStatus.cancelled },
+      });
+    }
+
     return {
       ok: ids.length > 0 || fetched === 0,
       fetched,
       upserted: ids.length,
-      cancelled: cancelled.count,
+      cancelled: cancelled.count + clearedSeed.count,
       sources,
       ...(errors ? { error: `${errors} fixture(s) failed to upsert` } : {}),
     };

@@ -6,8 +6,9 @@ import Link from "next/link";
 /** Processed from official litre-images assets — do not redraw in SVG. */
 const BRAND = {
   light: { src: "/brand/logo-light.png", width: 1984, height: 453 },
-  dark: { src: "/brand/logo-dark.png", width: 1169, height: 268 },
+  dark: { src: "/brand/logo-dark.png", width: 1984, height: 453 },
   mark: { src: "/brand/mark.png", width: 615, height: 426 },
+  markLight: { src: "/brand/mark-light.png", width: 414, height: 170 },
 } as const;
 
 type MarkProps = {
@@ -20,8 +21,9 @@ type MarkProps = {
 export function BrandMark({
   size = 40,
   className = "",
+  inverted = false,
 }: MarkProps) {
-  const asset = BRAND.mark;
+  const asset = inverted ? BRAND.markLight : BRAND.mark;
   const w = Math.round(size * (asset.width / asset.height));
 
   return (
@@ -62,7 +64,9 @@ export default function BrandLogo({
     ? inverted
       ? BRAND.dark
       : BRAND.light
-    : BRAND.mark;
+    : inverted
+      ? BRAND.markLight
+      : BRAND.mark;
   const w = Math.round(h * (asset.width / asset.height));
 
   const content = (
